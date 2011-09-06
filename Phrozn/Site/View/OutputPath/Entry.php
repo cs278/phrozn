@@ -42,16 +42,29 @@ class Entry
     public function get()
     {
         $permalink = $this->getView()->getParam('this.permalink', null);
+        $config = $this->getView()->getSiteConfig();
+        $default_permalink = null;
 
-        if ($permalink === null) {
+        if (!is_string($permalink))
+        {
+            $permalink = null;
+        }
+
+        if (!empty($config['entries']['permalink'])) {
+            $default_permalink = $config['entries']['permalink'];
+        }
+
+        if ($permalink === null && !class_exists($default_permalink)) {
             return rtrim($this->getView()->getOutputDir(), '/')
                 . '/'
                 . ltrim($this->getRelativeFile('entries', false), '/') . '.html';
-        } 
+        }
 
         $class = 'Phrozn\\Site\\View\\OutputPath\\Entry\\' . ucfirst($permalink);
         if (!class_exists($class)) {
-            $class = 'Phrozn\\Site\\View\\OutputPath\\Entry\\Parametrized';
+            $class = class_exists($default_permalink)
+                ? $default_permalink
+                : 'Phrozn\\Site\\View\\OutputPath\\Entry\\Parametrized';
         }
 
         $object = new $class($this->getView());
