@@ -463,7 +463,16 @@ abstract class Base
      */
     protected function applyLayout($content, $vars)
     {
-        $layoutName = $this->getParam('page.layout', ViewFactory::DEFAULT_LAYOUT_SCRIPT);
+        $layoutName = $this->getParam('page.layout', null);
+
+        if ($layoutName === null) {
+            $layoutName = $this->getParam('site.entries.layout', null);
+        }
+
+        if ($layoutName === null) {
+            $this->hasLayout(false);
+            return $content;
+        }
 
         $inputFile = $this->getInputFile();
         $pos = strpos($inputFile, '/entries');
