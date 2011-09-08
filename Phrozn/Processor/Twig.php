@@ -42,7 +42,13 @@ class Twig
     private $twig;
 
     /**
-     * If configuration options are passes then twig environment 
+     * Filesystem loader which is used once the template is loaded.
+     * @var \Twig_Loader_Filesystem
+     */
+    private $filesystem;
+
+    /**
+     * If configuration options are passes then twig environment
      * is initialized right away
      *
      * @param array $options Processor options
@@ -59,9 +65,24 @@ class Twig
         \Twig_Autoloader::register();
 
         if (count($options)) {
-            $this->setConfig($options)
-                 ->getEnvironment();
+            $this->setConfig($options);
         }
+    }
+
+    /**
+     * Gateway to pass concrete Processor some configuration options
+     *
+     * @param array $options Options to pass to engine
+     *
+     * @return \Phrozn\Processor
+     */
+    public function setConfig($options)
+    {
+        parent::setConfig($options);
+
+        $this->getEnvironment(true);
+
+        return $this;
     }
 
     /**
@@ -74,16 +95,39 @@ class Twig
      */
     public function render($tpl, $vars = array())
     {
-        return $this->getEnvironment()
-                    ->loadTemplate($tpl)
-                    ->render($vars);
+        $config = $this->getConfig();
+        $environment = $this->getEnvironment();
+        $template = $environment->loadTemplate($tpl);
+
+        if ($this->filesystem !== null)	{
+            $loader = $environment->getLoader();
+
+            $environment->setLoader($this->filesystem);
+        }
+
+        $content = $template->render($vars);
+
+        if ($this->filesystem !== null)	{
+            $environment->setLoader($loader);
+        }
+
+        return $content;
     }
 
     private function getEnvironment($reset = false)
     {
         if ($reset === true || null === $this->twig) {
+            $config = $this->getConfig();
+
             $this->twig = new \Twig_Environment(
-                $this->getLoader(), $this->getConfig());
+                $this->getLoader(), $config);
+
+            if (isset($config['paths'])) {
+                $this->filesystem = new \Twig_Loader_Filesystem(
+                    $config['paths']);
+            } else {
+                $this->filesystem = null;
+            }
         }
 
         return $this->twig;
