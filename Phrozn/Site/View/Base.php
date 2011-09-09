@@ -510,7 +510,7 @@ abstract class Base
      *
      * @return \Phrozn\Site\View
      */
-    private function parse()
+    protected function parse()
     {
         if (isset($this->template, $this->frontMatter)) {
             return $this;
@@ -535,7 +535,7 @@ abstract class Base
      *
      * @return string
      */
-    private function readSourceFile()
+    final protected function readSourceFile()
     {
         if (null == $this->source) {
             $path = $this->getInputFile();
