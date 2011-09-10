@@ -39,7 +39,7 @@ class Twig
      * Reference to twig engine environment object
      * @var \Twig_Environment
      */
-    private $twig;
+    protected $twig;
 
     /**
      * Filesystem loader which is used once the template is loaded.
@@ -114,7 +114,7 @@ class Twig
         return $content;
     }
 
-    private function getEnvironment($reset = false)
+    protected function getEnvironment($reset = false)
     {
         if ($reset === true || null === $this->twig) {
             $config = $this->getConfig();
@@ -133,7 +133,7 @@ class Twig
         return $this->twig;
     }
 
-    private function getLoader()
+    protected function getLoader()
     {
         return new \Twig_Loader_String();
     }
