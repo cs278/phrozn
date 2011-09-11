@@ -170,6 +170,12 @@ abstract class Base
 
         }
 
+        foreach ($this->getParam('page.processors', array()) as $class => $options) {
+            if (class_exists($class)) {
+                $this->addProcessor(new $class($options));
+            }
+        }
+
         // convert view into static representation
         $view = $this->getTemplate();
         foreach ($this->getProcessors() as $processor) {
