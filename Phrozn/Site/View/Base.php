@@ -151,7 +151,7 @@ abstract class Base
     public function render($vars = array())
     {
         // inject front matter options into template
-        $vars = array_merge($vars, $this->getParams());
+        $vars = array_merge_recursive($vars, $this->getParams());
         
         // inject providers content
         if ($providers = $this->getParam('page.providers', false)) {
