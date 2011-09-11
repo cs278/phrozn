@@ -151,8 +151,12 @@ abstract class Base
     public function render($vars = array())
     {
         // inject front matter options into template
-        $vars = array_merge($vars, $this->getParams());
-        
+        $vars = array_merge_recursive($vars, $this->getParams());
+
+        if (!isset($vars['this']['rootPath'])) {
+            $vars['this']['rootPath'] = $vars['page']['rootPath'] = $this->getRootPathPrefix();
+        }
+
         // inject providers content
         if ($providers = $this->getParam('page.providers', false)) {
             $factory = new ProviderFactory();
@@ -177,6 +181,25 @@ abstract class Base
         }
 
         return $view;
+    }
+
+    protected function getRootPathPrefix()
+    {
+        $rootPath = $this->getOutputDir();
+        $outputPath = dirname($this->getOutputFile()) . '/';
+
+        if ($outputPath === $rootPath) {
+            $rootPathPrefix = '.';
+        }
+        else if (strpos($outputPath, $rootPath) === 0) {
+            $depth = substr_count(substr($outputPath, strlen($rootPath)), DIRECTORY_SEPARATOR);
+            $rootPathPrefix = rtrim(str_repeat('../', $depth), '/');
+        }
+        else {
+            $rootPathPrefix = '.';
+        }
+
+        return $rootPathPrefix;
     }
 
     /**
