@@ -222,8 +222,13 @@ abstract class Base
      */
     public function getOutputFile()
     {
-        $path = new OutputFile($this);
-        return $path->get();
+        if (null === $this->outputFile) {
+            $path = new OutputFile($this);
+            return $path->get();
+        }
+        else {
+            return $this->outputFile;
+        }
     }
 
     /**
