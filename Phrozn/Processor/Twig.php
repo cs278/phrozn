@@ -22,7 +22,8 @@
  */
 
 namespace Phrozn\Processor;
-use Phrozn\Autoloader as Loader;
+use Phrozn\Autoloader as Loader,
+    Phrozn\Path\Project as ProjectPath;
 
 /**
  * Twig templates processor
@@ -47,7 +48,7 @@ class Twig
      *
      * @param array $options Processor options
      *
-     * @return void
+     * @return \Phrozn\Processor\Twig
      */
     public function __construct($options = array())
     {
