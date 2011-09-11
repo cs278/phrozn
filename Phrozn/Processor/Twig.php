@@ -74,23 +74,62 @@ class Twig
      */
     public function render($tpl, $vars = array())
     {
-        return $this->getEnvironment()
-                    ->loadTemplate($tpl)
-                    ->render($vars);
+        $config = $this->getConfig();
+        $environment = $this->getEnvironment();
+        $loader = $environment->getLoader();
+
+        // Last thing to do before the preceedings begin is install the Twig string
+        // loader.
+        if (!$loader instanceof \Twig_Loader_Chain) {
+            // Replace the current loader with the chain loader inserting
+            // the replaced loader into the chain loader. Phew!
+            $environment->setLoader(new \Twig_Loader_Chain(array($loader)));
+            $loader = $environment->getLoader();
+        }
+        $loader->addLoader(new \Twig_Loader_String);
+
+        $template = $environment->loadTemplate($tpl);
+
+        $content = $template->render($vars);
+
+        return $content;
     }
 
-    protected function getEnvironment($reset = false)
+    /**
+     * Fetches a configured Twig renderer.
+     *
+     * @return \Twig_Environment
+     */
+    public function getEnvironment()
     {
-        if ($reset === true || null === $this->twig) {
-            $this->twig = new \Twig_Environment(
-                $this->getLoader(), $this->getConfig());
+        if (null === $this->twig) {
+            $this->twig = $this->instantiateEnvironment();
         }
 
         return $this->twig;
     }
 
-    protected function getLoader()
+    /**
+     * Sets the Twig environment.
+     *
+     * @param \Twig_Environment $twig
+     *
+     * @return Twig
+     */
+    public function setEnvironment(\Twig_Environment $twig)
     {
-        return new \Twig_Loader_String();
+        $this->twig = $twig;
+
+        return $this;
+    }
+
+    /**
+     * Constructs a default Twig renderer.
+     *
+     * @return \Twig_Environment
+     */
+    protected function instantiateEnvironment()
+    {
+        return new \Twig_Environment(new \Twig_Loader_Chain, $this->getConfig());
     }
 }
