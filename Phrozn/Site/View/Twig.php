@@ -69,15 +69,4 @@ class Twig
         }
         return $view;
     }
-
-    /**
-     * Get output file path
-     *
-     * @return string
-     */
-    public function getOutputFile()
-    {
-        $path = new OutputFile($this);
-        return $path->get();
-    }
 }
