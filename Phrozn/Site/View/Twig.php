@@ -38,26 +38,18 @@ class Twig
     implements Site\View
 {
     /**
-     * Set input file path
+     * Initialize view
      *
-     * @param string $file Path to file
+     * @param string $inputFile Path to view source file
+     * @param string $outputDir File destination path
      *
      * @return \Phrozn\Site\View
      */
-    public function setInputFile($path)
+    public function __construct($inputFile = null, $outputDir = null)
     {
-        if ($path !== null) {
-            $processors = $this->getProcessors();
+        parent::__construct($inputFile, $outputDir);
 
-            if (!isset($processors['\\Phrozn\\Processor\\Twig'])) {
-                $project = new \Phrozn\Path\Project($path);
-
-                $this->addProcessor(new Processor(array(
-                    'paths' => array($project->get()))));
-            }
-        }
-
-        return parent::setInputFile($path);
+        $this->addProcessor(new Processor());
     }
 
     /**
