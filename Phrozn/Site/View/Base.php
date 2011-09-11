@@ -516,11 +516,24 @@ abstract class Base
             return $this;
         }
 
+        $this->frontMatter = array();
+
+        $files = array(
+            dirname($this->getInputFile()) . '/config.yml',
+            $this->getInputFile() . '.yml',
+        );
+
+        foreach ($files as $file) {
+            if (file_exists($file)) {
+                $this->frontMatter = array_merge_recursive($this->frontMatter, Yaml::load($file) ?: array());
+            }
+        }
+
         $source = $this->readSourceFile();
 
         $parts = preg_split('/[\n]*[-]{3}[\n]/', $source, 2);
         if (count($parts) === 2) {
-            $this->frontMatter = Yaml::load($parts[0]);
+            $this->frontMatter = array_merge_recursive($this->frontMatter, Yaml::load($parts[0]) ?: array());
             $this->template = trim($parts[1]);
         } else {
             $this->frontMatter = array();
